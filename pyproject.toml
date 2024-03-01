@@ -2,12 +2,16 @@
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
+# -------------------------------------------
+# Project
+# -------------------------------------------
+
 [project]
 name = "pycodegen-agent"
 dynamic = ["version"]
 description = 'LLM Agent for Python code generation'
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.18, <3.12"
 license = "MIT"
 keywords = [
   "LLM",
@@ -19,36 +23,63 @@ authors = [
 ]
 classifiers = [
   "Development Status :: 4 - Beta",
+  "Intended Audience :: Science/Research",
   "License :: Freely Distributable",
+  "License :: OSI Approved :: MIT License",
   "Operating System :: OS Independent",
+  "Framework :: Hatch",
   "Programming Language :: Python",
   "Programming Language :: Python :: 3.8",
   "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
-  "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: Implementation :: PyPy",
   "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Topic :: Software Development :: Code Generators",
+  "Natural Language :: English"
 ]
 dependencies = [
   "click",
 ]
 
 [project.urls]
-Documentation = "https://github.com/unknown/pycodegen-agent#readme"
-Issues = "https://github.com/unknown/pycodegen-agent/issues"
-Source = "https://github.com/unknown/pycodegen-agent"
+Documentation = "https://github.com/tgran2028/pycodegen-agent#readme"
+Issues = "https://github.com/tgran2028/pycodegen-agent/issues"
+Source = "https://github.com/tgran2028/pycodegen-agent"
+"GitHub: repo" = "https://github.com/tgran2028/pycodegen-agent"
+
+# -------------------------------------------
+# Hatch
+# -------------------------------------------
 
 [tool.hatch.version]
 path = "src/pycodegen_agent/__about__.py"
+pattern = "(?P<version>.+)"
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "/src/pycodegen_agent",
+]
+
+# -------------------------------------------
+# Hatch Envs
+# -------------------------------------------
+[[tool.hatch.envs.all.matrix]]
+python = ["3.8", "3.9", "3.10", "3.11"]
 
 
+# ~~ default ~~
 [tool.hatch.envs.default]
 dependencies = [
   "pre-commit",
   # type check
   "mypy",
   "coverage[toml]>=6.5",
+  "types-all",
+  # "pyright",
   # test
   "pytest",
   "pytest-cov",
@@ -77,18 +108,19 @@ cov = [
 ]
 format = "isort ./src && black ./src"
 
-[[tool.hatch.envs.all.matrix]]
-python = ["3.8", "3.9", "3.10", "3.11"]
+
+
 
 [tool.hatch.envs.types]
 dependencies = [
-  "mypy>=1.0.0",
+  "mypy"
 ]
+
 [tool.hatch.envs.types.scripts]
-check = "mypy --install-types --non-interactive {args:src/pycodegen_agent tests}"
+check = "mypy --install-types --non-interactive src"
 
 # -------------------------------------------
-# Tools
+# Other Tools
 # -------------------------------------------
 
 # ~~ coverage ~~
@@ -123,7 +155,10 @@ ignore_missing_imports = true
 line-length = 120
 target-version = ["py38"]
 
-
+# ~~ isort ~~
+[tool.isort]
+profile = "black"
+line_length = 120
 
 # [tool.hatch.envs.default]
 # dependencies = [
@@ -157,7 +192,11 @@ target-version = ["py38"]
 
 
 [tool.ruff]
+# ruff defaults: https://github.com/pypa/hatch/blob/master/ruff_defaults.toml
 target-version = "py38"
+exclude = [".git", "**/__pycache__", "ref/**", ".venv"]
+include = ["src/pycodegen_agent", "tests"]
+line-length = 120
 ignore = [
   "F401",     # unused-import
   "PERF401",	# Use a list comprehension to create a transformed list
@@ -194,8 +233,43 @@ select = [
   "UP",     # pyupgrade
 ]
 
+[tool.ruff.format]
+docstring-code-format = true
+docstring-code-line-length = 80
+
 [tool.ruff.mccabe]
 max-complexity = 28
 
 [tool.ruff.pylint]
 allow-magic-value-types = ["float", "int", "str"]
+
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "all"
+
+[tool.ruff.lint.isort]
+known-first-party = ["hatch", "hatchling"]
+
+[tool.ruff.lint.per-file-ignores]
+"**/scripts/*" = [
+  "INP001",
+  "T201",
+]
+"**/tests/**/*" = [
+  "PLC1901",
+  "PLR2004",
+  "PLR6301",
+  "S",
+  "TID252",
+]
+
+
+
+
+# ~~ pyright ~~
+[tool.pyright]
+include = [
+  "src",
+]
+typeCheckingMode = "standard"
+# venvPath = 
+pythonVersion = "3.8"

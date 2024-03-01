@@ -34,6 +34,13 @@ repos:
     additional_dependencies:
     - tomli
 
+- repo: https://github.com/asottile/pyupgrade
+  rev: v2.0.1
+  hooks:
+  - id: pyupgrade
+    args: ["--py38-plus"]
+    
+
 # - repo: https://github.com/pecigonzalo/pre-commit-shfmt
 #   sha: v2.1.0
 #   hooks:
